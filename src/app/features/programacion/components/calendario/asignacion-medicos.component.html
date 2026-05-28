@@ -1,0 +1,265 @@
+<!-- ═══════════════════════════════════════════════════════════
+     Asignación de Médicos — Galenos Pro Programación
+     ═══════════════════════════════════════════════════════════ -->
+<div class="tw-flex tw-flex-col tw-gap-4">
+
+  <div class="tw-flex tw-items-center tw-justify-between">
+    <div>
+      <h2 class="tw-text-xl tw-font-bold tw-text-[#1e293b] tw-m-0">Asignación de Médicos</h2>
+      <p class="tw-text-sm tw-text-[#64748b] tw-mt-1 tw-mb-0">
+        Asigne médicos a franjas horarias del calendario
+      </p>
+    </div>
+    <p-button label="Nueva Asignación" icon="pi pi-plus" size="small" (onClick)="abrirAsignacion()" />
+  </div>
+
+  <div class="tw-grid tw-grid-cols-1 lg:tw-grid-cols-3 tw-gap-6">
+
+    <!-- Panel izquierdo: Calendario + Lista de médicos -->
+    <div class="tw-flex tw-flex-col tw-gap-4">
+
+      <!-- Calendario interactivo -->
+      <div class="gp-card tw-p-4">
+        <h3 class="tw-text-sm tw-font-semibold tw-text-[#1e293b] tw-mb-3 tw-flex tw-items-center tw-gap-2">
+          <i class="pi pi-calendar tw-text-[#2378f0]"></i> Seleccionar Fecha
+        </h3>
+        <p-datepicker
+          [(ngModel)]="selectedDate"
+          (ngModelChange)="onFechaChange($event)"
+          [inline]="true"
+          dateFormat="dd/mm/yy"
+          [firstDayOfWeek]="1"
+          styleClass="tw-w-full gp-datepicker-inline" />
+        <div class="tw-mt-3 tw-text-xs tw-text-[#64748b] tw-text-center">
+          Fecha seleccionada:
+          <strong class="tw-text-[#2378f0]">{{ selectedDate() | date:'dd/MM/yyyy' }}</strong>
+        </div>
+      </div>
+
+      <!-- Lista de médicos disponibles -->
+      <div class="gp-card">
+        <div class="gp-card-header">
+          <span class="tw-text-sm tw-font-semibold tw-flex tw-items-center tw-gap-2">
+            <i class="pi pi-users tw-text-[#2378f0]"></i> Médicos
+          </span>
+          <span class="tw-text-xs tw-text-[#94a3b8]">{{ medicos().length }} registrados</span>
+        </div>
+        <div class="gp-card-body tw-flex tw-flex-col tw-gap-2 tw-p-3">
+          @for (med of medicos(); track med.id) {
+            <div
+              class="tw-flex tw-items-center tw-justify-between tw-p-2.5 tw-rounded-lg tw-border tw-cursor-pointer tw-transition-all"
+              [class.tw-border-[#e2e8f0]]="true"
+              [class.tw-opacity-60]="!med.disponible"
+              [class.hover:tw-bg-blue-50]="med.disponible"
+              (click)="med.disponible && abrirAsignacion(med)">
+              <div class="tw-flex tw-items-center tw-gap-2.5">
+                <p-avatar
+                  [label]="med.nombre.charAt(0)"
+                  shape="circle"
+                  size="normal"
+                  [style]="{ background: med.color + '22', color: med.color, fontWeight: '700' }" />
+                <div>
+                  <div class="tw-text-sm tw-font-medium tw-text-[#1e293b]">{{ med.nombre }}</div>
+                  <div class="tw-text-xs tw-text-[#64748b]">{{ med.especialidad }}</div>
+                </div>
+              </div>
+              <div class="tw-flex tw-items-center tw-gap-2">
+                <span
+                  class="tw-w-2 tw-h-2 tw-rounded-full"
+                  [class.tw-bg-green-500]="med.disponible"
+                  [class.tw-bg-red-400]="!med.disponible"
+                  [pTooltip]="med.disponible ? 'Disponible' : 'No disponible'">
+                </span>
+                @if (med.disponible) {
+                  <i class="pi pi-plus-circle tw-text-xs tw-text-[#2378f0]"
+                     pTooltip="Asignar al día seleccionado"></i>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel derecho: Agenda del día -->
+    <div class="tw-col-span-2 gp-card">
+      <div class="gp-card-header">
+        <div class="tw-flex tw-items-center tw-gap-2">
+          <i class="pi pi-list tw-text-[#2378f0]"></i>
+          <h3 class="tw-text-sm tw-font-semibold tw-text-[#1e293b] tw-m-0">
+            Agenda del {{ selectedDate() | date:'EEEE dd/MM/yyyy' }}
+          </h3>
+        </div>
+        <span class="tw-text-xs tw-text-[#94a3b8]">{{ asignacionesDia.length }} asignaciones</span>
+      </div>
+      <div class="gp-card-body">
+
+        @if (asignacionesDia.length === 0) {
+          <div class="tw-flex tw-flex-col tw-items-center tw-py-16 tw-text-[#94a3b8]">
+            <i class="pi pi-calendar tw-text-5xl tw-mb-4"></i>
+            <p class="tw-font-medium tw-text-[#475569] tw-m-0">Sin asignaciones para este día</p>
+            <p-button label="Asignar médico" icon="pi pi-plus" size="small" [text]="true"
+                      class="tw-mt-3" (onClick)="abrirAsignacion()" />
+          </div>
+        }
+
+        <div class="tw-flex tw-flex-col tw-gap-3">
+          @for (asig of asignacionesDia; track asig.id) {
+            <div class="tw-flex tw-items-center tw-gap-4 tw-p-4 tw-rounded-xl tw-border"
+                 [style.border-color]="getColorMedico(asig.medico.id) + '44'"
+                 [style.background]="getColorMedico(asig.medico.id) + '08'">
+
+              <!-- Franja de color a la izquierda -->
+              <div class="tw-w-1 tw-self-stretch tw-rounded-full tw-flex-shrink-0"
+                   [style.background]="getColorMedico(asig.medico.id)"></div>
+
+              <!-- Horario -->
+              <div class="tw-text-center tw-flex-shrink-0">
+                <div class="tw-font-bold tw-text-sm" [style.color]="getColorMedico(asig.medico.id)">
+                  {{ asig.horaInicio }}
+                </div>
+                <div class="tw-text-xs tw-text-[#94a3b8]">——</div>
+                <div class="tw-font-bold tw-text-sm" [style.color]="getColorMedico(asig.medico.id)">
+                  {{ asig.horaFin }}
+                </div>
+              </div>
+
+              <!-- Info médico -->
+              <div class="tw-flex-1 tw-min-w-0">
+                <div class="tw-font-semibold tw-text-sm tw-text-[#1e293b]">{{ asig.medico.nombre }}</div>
+                <div class="tw-text-xs tw-text-[#64748b]">{{ asig.medico.especialidad }}</div>
+                <div class="tw-text-xs tw-text-[#94a3b8] tw-mt-0.5">
+                  <i class="pi pi-building tw-mr-1"></i>{{ asig.consultorio }}
+                </div>
+              </div>
+
+              <!-- Cupos + Tipo -->
+              <div class="tw-text-right tw-flex-shrink-0">
+                <p-tag
+                  [value]="asig.tipo"
+                  [severity]="asig.tipo === 'TURNO_GUARDIA' ? 'danger' : 'info'"
+                  styleClass="tw-text-xs tw-mb-2" />
+                @if (asig.cupos > 0) {
+                  <div class="tw-text-xs tw-text-[#64748b]">
+                    <i class="pi pi-users tw-mr-1"></i>{{ asig.cupos }} cupos
+                  </div>
+                }
+              </div>
+
+              <!-- Acciones -->
+              <div>
+                <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" size="small" />
+                <p-button icon="pi pi-trash"  [rounded]="true" [text]="true" severity="danger"    size="small" />
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Modal Nueva Asignación ─────────────────────────────────── -->
+<p-dialog
+  [visible]="showModal()"
+  (visibleChange)="showModal.set($event)"
+  header="Nueva Asignación de Médico"
+  [modal]="true" [draggable]="false"
+  [style]="{ width: '540px' }">
+
+  <div class="tw-flex tw-flex-col tw-gap-5 tw-pt-2">
+
+    <!-- Selección de médicos (multiple) -->
+    <div>
+      <label class="tw-text-xs tw-font-medium tw-text-[#64748b] tw-block tw-mb-1.5">
+        Médico(s) a asignar *
+      </label>
+      <p-multiselect
+        [(ngModel)]="formData.medicosSeleccionados"
+        [options]="medicos()"
+        optionLabel="nombre"
+        placeholder="Seleccione uno o más médicos"
+        styleClass="tw-w-full"
+        display="chip">
+        <ng-template pTemplate="item" let-med>
+          <div class="tw-flex tw-items-center tw-gap-2">
+            <div class="tw-w-2 tw-h-2 tw-rounded-full" [style.background]="med.color"></div>
+            <span>{{ med.nombre }}</span>
+            <span class="tw-text-xs tw-text-[#94a3b8] tw-ml-auto">{{ med.especialidad }}</span>
+          </div>
+        </ng-template>
+      </p-multiselect>
+    </div>
+
+    <!-- Fecha -->
+    <div>
+      <label class="tw-text-xs tw-font-medium tw-text-[#64748b] tw-block tw-mb-1.5">Fecha *</label>
+      <p-datepicker
+        [(ngModel)]="formData.fecha"
+        dateFormat="dd/mm/yy"
+        [showIcon]="true"
+        styleClass="tw-w-full" />
+    </div>
+
+    <!-- Horario -->
+    <div class="tw-grid tw-grid-cols-2 tw-gap-4">
+      <div>
+        <label class="tw-text-xs tw-font-medium tw-text-[#64748b] tw-block tw-mb-1.5">Hora inicio *</label>
+        <p-select
+          [(ngModel)]="formData.horaInicio"
+          [options]="franjas"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccionar"
+          styleClass="tw-w-full" />
+      </div>
+      <div>
+        <label class="tw-text-xs tw-font-medium tw-text-[#64748b] tw-block tw-mb-1.5">Hora fin *</label>
+        <p-select
+          [(ngModel)]="formData.horaFin"
+          [options]="franjas"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccionar"
+          styleClass="tw-w-full" />
+      </div>
+    </div>
+
+    <!-- Tipo + Consultorio + Cupos -->
+    <div class="tw-grid tw-grid-cols-3 tw-gap-4">
+      <div>
+        <label class="tw-text-xs tw-font-medium tw-text-[#64748b] tw-block tw-mb-1.5">Tipo</label>
+        <p-select
+          [(ngModel)]="formData.tipo"
+          [options]="tipoOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Tipo"
+          styleClass="tw-w-full" />
+      </div>
+      <div>
+        <p-floatlabel variant="on">
+          <input pInputText id="consultorio" [(ngModel)]="formData.consultorio" class="tw-w-full"
+                 placeholder="Ej: Cons. 01" />
+          <label for="consultorio">Consultorio</label>
+        </p-floatlabel>
+      </div>
+      <div>
+        <p-floatlabel variant="on">
+          <input pInputText id="cupos" [(ngModel)]="formData.cupos" class="tw-w-full" type="number" />
+          <label for="cupos">Cupos</label>
+        </p-floatlabel>
+      </div>
+    </div>
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="tw-flex tw-gap-3 tw-justify-end">
+      <p-button label="Cancelar" severity="secondary" outlined (onClick)="showModal.set(false)" />
+      <p-button label="Guardar Asignación" icon="pi pi-check"
+                [loading]="isSaving()" (onClick)="guardarAsignacion()" />
+    </div>
+  </ng-template>
+</p-dialog>

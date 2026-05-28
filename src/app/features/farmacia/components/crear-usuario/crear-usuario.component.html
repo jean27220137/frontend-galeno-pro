@@ -1,0 +1,337 @@
+<div class="cu-page">
+<div class="cu-card">
+
+  <!-- ── Header ── -->
+  <div class="cu-card__header">
+    <div class="cu-header__icon"><i class="pi pi-user-plus"></i></div>
+    <div class="cu-header__text">
+      <h2 class="cu-header__title">Crear Usuario</h2>
+      <p class="cu-header__subtitle">Registro completo de personal — Módulo Farmacia</p>
+    </div>
+    <span class="cu-header__badge"><i class="pi pi-shield"></i> Solo ADMIN</span>
+  </div>
+
+  <!-- ── Step Indicator ── -->
+  <div class="cu-steps">
+    @for (step of steps; track step.num) {
+      <div class="cu-step-item"
+           [class.cu-step-item--active]="currentStep() === step.num"
+           [class.cu-step-item--done]="currentStep() > step.num">
+        <div class="cu-step-bubble">
+          @if (currentStep() > step.num) {
+            <i class="pi pi-check"></i>
+          } @else {
+            <i [class]="step.icon"></i>
+          }
+        </div>
+        <span class="cu-step-label">{{ step.label }}</span>
+        @if (!$last) { <div class="cu-step-connector"></div> }
+      </div>
+    }
+  </div>
+
+  <!-- ── Progress bar ── -->
+  <div class="cu-progress"><div class="cu-progress__fill" [style.width.%]="progressPct"></div></div>
+
+  <!-- ── Formulario ── -->
+  <form [formGroup]="form" novalidate autocomplete="off">
+  <div class="cu-card__body">
+
+    <!-- ═══════════════════════════════════════════════
+         PASO 1 — Datos Personales
+    ═══════════════════════════════════════════════ -->
+    @if (currentStep() === 1) {
+      <div class="cu-section__label"><i class="pi pi-id-card"></i> Identificación</div>
+
+      <div class="cu-grid">
+        <!-- Tipo documento -->
+        <div class="cu-field">
+          <label class="cu-field__label">Tipo de documento *</label>
+          <p-select formControlName="tipoDocumento"
+                    [options]="tiposDocumento"
+                    optionLabel="label" optionValue="value"
+                    styleClass="tw-w-full"
+                    [class.ng-invalid]="hasError('tipoDocumento')" />
+        </div>
+
+        <!-- Nro documento -->
+        <div class="cu-field">
+          <label class="cu-field__label">Número de documento *</label>
+          <p-iconfield>
+            <p-inputicon class="pi pi-credit-card" />
+            <input pInputText formControlName="numeroDocumento"
+                   placeholder="12345678" class="tw-w-full"
+                   [class.ng-invalid]="hasError('numeroDocumento')" />
+          </p-iconfield>
+          @if (hasError('numeroDocumento')) {
+            <span class="cu-field__error"><i class="pi pi-exclamation-circle"></i>{{ getErrorMsg('numeroDocumento') }}</span>
+          }
+        </div>
+
+        <!-- Nombres -->
+        <div class="cu-field cu-grid--full">
+          <label class="cu-field__label">Nombres completos *</label>
+          <p-iconfield>
+            <p-inputicon class="pi pi-user" />
+            <input pInputText formControlName="nombres"
+                   placeholder="Ej: Juan Carlos" class="tw-w-full"
+                   [class.ng-invalid]="hasError('nombres')" />
+          </p-iconfield>
+          @if (hasError('nombres')) {
+            <span class="cu-field__error"><i class="pi pi-exclamation-circle"></i>{{ getErrorMsg('nombres') }}</span>
+          }
+        </div>
+
+        <!-- Apellido paterno -->
+        <div class="cu-field">
+          <label class="cu-field__label">Apellido paterno *</label>
+          <input pInputText formControlName="apellidoPaterno"
+                 placeholder="Ej: García" class="tw-w-full"
+                 [class.ng-invalid]="hasError('apellidoPaterno')" />
+          @if (hasError('apellidoPaterno')) {
+            <span class="cu-field__error"><i class="pi pi-exclamation-circle"></i>{{ getErrorMsg('apellidoPaterno') }}</span>
+          }
+        </div>
+
+        <!-- Apellido materno -->
+        <div class="cu-field">
+          <label class="cu-field__label">Apellido materno *</label>
+          <input pInputText formControlName="apellidoMaterno"
+                 placeholder="Ej: López" class="tw-w-full"
+                 [class.ng-invalid]="hasError('apellidoMaterno')" />
+          @if (hasError('apellidoMaterno')) {
+            <span class="cu-field__error"><i class="pi pi-exclamation-circle"></i>{{ getErrorMsg('apellidoMaterno') }}</span>
+          }
+        </div>
+
+        <!-- Fecha nacimiento -->
+        <div class="cu-field">
+          <label class="cu-field__label">Fecha de nacimiento *</label>
+          <input pInputText type="date" formControlName="fechaNacimiento"
+                 class="tw-w-full"
+                 [class.ng-invalid]="hasError('fechaNacimiento')" />
+          @if (hasError('fechaNacimiento')) {
+            <span class="cu-field__error"><i class="pi pi-exclamation-circle"></i>{{ getErrorMsg('fechaNacimiento') }}</span>
+          }
+        </div>
+
+        <!-- Teléfono -->
+        <div class="cu-field">
+          <label class="cu-field__label">Teléfono *</label>
+          <p-iconfield>
+            <p-inputicon class="pi pi-phone" />
+            <input pInputText formControlName="telefono"
+                   placeholder="987654321" class="tw-w-full"
+                   [class.ng-invalid]="hasError('telefono')" />
+          </p-iconfield>
+          @if (hasError('telefono')) {
+            <span class="cu-field__error"><i class="pi pi-exclamation-circle"></i>{{ getErrorMsg('telefono') }}</span>
+          }
+        </div>
+
+        <!-- Dirección -->
+        <div class="cu-field cu-grid--full">
+          <label class="cu-field__label">Dirección de domicilio *</label>
+          <textarea pTextarea formControlName="direccionDomicilio"
+                    placeholder="Av. Principal 123, Urbanización..." rows="2"
+                    class="tw-w-full"
+                    [class.ng-invalid]="hasError('direccionDomicilio')"></textarea>
+          @if (hasError('direccionDomicilio')) {
+            <span class="cu-field__error"><i class="pi pi-exclamation-circle"></i>{{ getErrorMsg('direccionDomicilio') }}</span>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ═══════════════════════════════════════════════
+         PASO 2 — Datos Profesionales
+    ═══════════════════════════════════════════════ -->
+    @if (currentStep() === 2) {
+      <div class="cu-section__label"><i class="pi pi-briefcase"></i> Datos laborales</div>
+
+      <div class="cu-grid">
+        <!-- Condición laboral -->
+        <div class="cu-field">
+          <label class="cu-field__label">Condición laboral *</label>
+          <p-select formControlName="condicionLaboral"
+                    [options]="condicionesLaborales"
+                    optionLabel="label" optionValue="value"
+                    placeholder="Seleccionar..." styleClass="tw-w-full"
+                    [class.ng-invalid]="hasError('condicionLaboral')" />
+          @if (hasError('condicionLaboral')) {
+            <span class="cu-field__error"><i class="pi pi-exclamation-circle"></i>{{ getErrorMsg('condicionLaboral') }}</span>
+          }
+        </div>
+
+        <!-- Área asignada -->
+        <div class="cu-field">
+          <label class="cu-field__label">Área asignada <span class="cu-optional-badge">Opcional</span></label>
+          <p-select formControlName="areaAsignada"
+                    [options]="areasDisponibles"
+                    optionLabel="label" optionValue="value"
+                    placeholder="Seleccionar..." styleClass="tw-w-full" />
+        </div>
+
+        <!-- Colegiatura -->
+        <div class="cu-field cu-grid--full">
+          <label class="cu-field__label">
+            Número de colegiatura
+            @if (esQuimico) {
+              <span class="cu-required-badge">Requerido para Q.F.</span>
+            } @else {
+              <span class="cu-optional-badge">Opcional</span>
+            }
+          </label>
+          <p-iconfield>
+            <p-inputicon class="pi pi-verified" />
+            <input pInputText formControlName="colegiatura"
+                   placeholder="Ej: CQFP-12345" class="tw-w-full" />
+          </p-iconfield>
+          <small class="cu-field__hint">Número del Colegio Químico Farmacéutico del Perú (CQFP)</small>
+        </div>
+
+        <!-- Fecha ingreso -->
+        <div class="cu-field cu-grid--full">
+          <label class="cu-field__label">Fecha de ingreso *</label>
+          <input pInputText type="date" formControlName="fechaIngreso"
+                 class="tw-w-full"
+                 [class.ng-invalid]="hasError('fechaIngreso')" />
+          @if (hasError('fechaIngreso')) {
+            <span class="cu-field__error"><i class="pi pi-exclamation-circle"></i>{{ getErrorMsg('fechaIngreso') }}</span>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ═══════════════════════════════════════════════
+         PASO 3 — Acceso, Seguridad y Roles
+    ═══════════════════════════════════════════════ -->
+    @if (currentStep() === 3) {
+      <!-- Acceso -->
+      <div class="cu-section__label"><i class="pi pi-key"></i> Credenciales de acceso</div>
+      <div class="cu-grid">
+        <!-- Correo -->
+        <div class="cu-field">
+          <label class="cu-field__label">Correo institucional *</label>
+          <p-iconfield>
+            <p-inputicon class="pi pi-envelope" />
+            <input pInputText type="email" formControlName="correoInstitucional"
+                   placeholder="usuario@hospital.gob.pe" class="tw-w-full"
+                   [class.ng-invalid]="hasError('correoInstitucional')" />
+          </p-iconfield>
+          @if (hasError('correoInstitucional')) {
+            <span class="cu-field__error"><i class="pi pi-exclamation-circle"></i>{{ getErrorMsg('correoInstitucional') }}</span>
+          }
+        </div>
+
+        <!-- Username -->
+        <div class="cu-field">
+          <label class="cu-field__label">Nombre de usuario *</label>
+          <p-iconfield>
+            <p-inputicon class="pi pi-at" />
+            <input pInputText formControlName="username"
+                   placeholder="ej: jgarcia" class="tw-w-full"
+                   [class.ng-invalid]="hasError('username')" />
+          </p-iconfield>
+          @if (hasError('username')) {
+            <span class="cu-field__error"><i class="pi pi-exclamation-circle"></i>{{ getErrorMsg('username') }}</span>
+          }
+        </div>
+
+        <!-- Password -->
+        <div class="cu-field">
+          <label class="cu-field__label">Contraseña *</label>
+          <p-password formControlName="password"
+                      placeholder="Mínimo 8 caracteres"
+                      [toggleMask]="true" [feedback]="true"
+                      styleClass="tw-w-full" inputStyleClass="tw-w-full"
+                      [class.ng-invalid]="hasError('password')" />
+          @if (hasError('password')) {
+            <span class="cu-field__error"><i class="pi pi-exclamation-circle"></i>{{ getErrorMsg('password') }}</span>
+          }
+        </div>
+
+        <!-- Confirm password -->
+        <div class="cu-field">
+          <label class="cu-field__label">Confirmar contraseña *</label>
+          <p-password formControlName="confirmPassword"
+                      placeholder="Repite la contraseña"
+                      [toggleMask]="true" [feedback]="false"
+                      styleClass="tw-w-full" inputStyleClass="tw-w-full"
+                      [class.ng-invalid]="hasError('confirmPassword') || passwordMismatch" />
+          @if (hasError('confirmPassword')) {
+            <span class="cu-field__error"><i class="pi pi-exclamation-circle"></i>La confirmación es requerida</span>
+          } @else if (passwordMismatch) {
+            <span class="cu-field__error"><i class="pi pi-exclamation-circle"></i>Las contraseñas no coinciden</span>
+          }
+        </div>
+
+        <!-- Estado -->
+        <div class="cu-field">
+          <label class="cu-field__label">Estado inicial *</label>
+          <p-select formControlName="estado"
+                    [options]="estadosDisponibles"
+                    optionLabel="label" optionValue="value"
+                    styleClass="tw-w-full" />
+        </div>
+
+        <!-- Firma digital -->
+        <div class="cu-field">
+          <label class="cu-field__label">Firma / sello digital <span class="cu-optional-badge">Opcional</span></label>
+          <p-iconfield>
+            <p-inputicon class="pi pi-pen-to-square" />
+            <input pInputText formControlName="firmaDigital"
+                   placeholder="Ruta o token del certificado" class="tw-w-full" />
+          </p-iconfield>
+          <small class="cu-field__hint">Token del certificado o ruta de la imagen del sello</small>
+        </div>
+      </div>
+
+      <!-- Roles -->
+      <div class="cu-divider">ROLES DEL SISTEMA</div>
+      <div class="cu-section__label"><i class="pi pi-tag"></i> Roles asignados — selecciona uno o más</div>
+      <div class="cu-roles-grid">
+        @for (rol of rolesDisponibles; track rol.value) {
+          <button type="button" class="cu-role-chip"
+                  [class.cu-role-chip--active]="form.get('roles')?.value?.includes(rol.value)"
+                  (click)="toggleRol(rol.value)">
+            <div class="cu-role-chip__icon"><i [class]="rol.icon"></i></div>
+            <span class="cu-role-chip__text">{{ rol.label }}</span>
+            @if (form.get('roles')?.value?.includes(rol.value)) {
+              <div class="cu-role-chip__check"><i class="pi pi-check"></i></div>
+            }
+          </button>
+        }
+      </div>
+      @if (hasError('roles')) {
+        <span class="cu-field__error tw-mt-2 tw-block">
+          <i class="pi pi-exclamation-circle"></i>Debes seleccionar al menos un rol
+        </span>
+      }
+    }
+
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="cu-card__footer">
+    <p-button label="Cancelar" severity="secondary" [outlined]="true"
+              icon="pi pi-times" (onClick)="onCancelar()" />
+    <div class="cu-footer__nav">
+      @if (currentStep() > 1) {
+        <p-button label="Anterior" severity="secondary" [outlined]="true"
+                  icon="pi pi-chevron-left" (onClick)="prevStep()" />
+      }
+      @if (currentStep() < totalSteps) {
+        <p-button label="Siguiente" icon="pi pi-chevron-right" iconPos="right"
+                  (onClick)="nextStep()" />
+      } @else {
+        <p-button label="Crear Usuario" icon="pi pi-user-plus"
+                  [loading]="isSaving()" (onClick)="onSubmit()" />
+      }
+    </div>
+  </div>
+  </form>
+
+</div>
+</div>
+

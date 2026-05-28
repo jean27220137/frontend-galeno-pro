@@ -1,0 +1,173 @@
+<!-- ═══════════════════════════════════════════════════════════
+     Dashboard Farmacia — Galenos Pro
+     ═══════════════════════════════════════════════════════════ -->
+<div class="tw-flex tw-flex-col tw-gap-6">
+
+  <!-- Encabezado de página -->
+  <div class="tw-flex tw-items-start tw-justify-between tw-flex-wrap tw-gap-3">
+    <div>
+      <h1 class="tw-text-xl sm:tw-text-2xl tw-font-bold tw-text-[#1e293b] tw-m-0">Dashboard Farmacia</h1>
+      <p class="tw-text-sm tw-text-[#64748b] tw-mt-1 tw-mb-0">
+        Resumen general del inventario y movimientos
+      </p>
+    </div>
+    <div class="tw-text-xs sm:tw-text-sm tw-text-[#64748b] tw-flex tw-items-center tw-gap-1.5 tw-whitespace-nowrap">
+      <i class="pi pi-clock"></i>
+      Actualizado: {{ today | date:'dd/MM/yyyy HH:mm' }}
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  @if (isLoading()) {
+    <div class="tw-grid tw-grid-cols-2 md:tw-grid-cols-3 xl:tw-grid-cols-6 tw-gap-4">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <p-skeleton height="6rem" borderRadius="0.75rem" />
+      }
+    </div>
+  } @else {
+    <div class="tw-grid tw-grid-cols-2 md:tw-grid-cols-3 xl:tw-grid-cols-6 tw-gap-4">
+      @for (card of kpiCards; track card.label) {
+        <div class="gp-card tw-p-4 tw-flex tw-flex-col tw-gap-2">
+          <div class="tw-flex tw-items-center tw-justify-between">
+            <div class="tw-w-9 tw-h-9 tw-rounded-lg tw-flex tw-items-center tw-justify-center"
+                 [style.background]="card.bg">
+              <i [class]="card.icon" [style.color]="card.color" class="tw-text-base"></i>
+            </div>
+          </div>
+          <div>
+            <div class="tw-text-lg sm:tw-text-2xl tw-font-bold tw-leading-tight tw-break-all" [style.color]="card.color">
+              @if (card.isMoneda) {
+                S/. {{ card.value | number:'1.2-2' }}
+              } @else {
+                {{ card.value | number }}
+              }
+            </div>
+            <div class="tw-text-xs tw-text-[#64748b] tw-font-medium tw-mt-0.5">{{ card.label }}</div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Gráficos -->
+  <div class="tw-grid tw-grid-cols-1 lg:tw-grid-cols-3 tw-gap-6">
+
+    <!-- Gráfico de línea — Movimientos 7 días -->
+    <div class="gp-card xl:tw-col-span-2">
+      <div class="gp-card-header">
+        <div class="tw-flex tw-items-center tw-gap-2">
+          <i class="pi pi-chart-line tw-text-[#2378f0]"></i>
+          <h3 class="tw-text-sm tw-font-semibold tw-text-[#1e293b] tw-m-0">
+            Movimientos — Últimos 7 días
+          </h3>
+        </div>
+        <div class="tw-flex tw-gap-3 tw-text-xs tw-text-[#64748b]">
+          <span class="tw-flex tw-items-center tw-gap-1">
+            <span class="tw-w-2 tw-h-2 tw-rounded-full tw-bg-[#10b981] tw-inline-block"></span>Entradas
+          </span>
+          <span class="tw-flex tw-items-center tw-gap-1">
+            <span class="tw-w-2 tw-h-2 tw-rounded-full tw-bg-[#ef4444] tw-inline-block"></span>Salidas
+          </span>
+        </div>
+      </div>
+      <div class="gp-card-body">
+        <div class="tw-h-64">
+          <canvas #movimientosChart></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráfico donut — Categorías -->
+    <div class="gp-card">
+      <div class="gp-card-header">
+        <div class="tw-flex tw-items-center tw-gap-2">
+          <i class="pi pi-chart-pie tw-text-[#00bcd4]"></i>
+          <h3 class="tw-text-sm tw-font-semibold tw-text-[#1e293b] tw-m-0">
+            Stock por Categoría
+          </h3>
+        </div>
+      </div>
+      <div class="gp-card-body">
+        <div class="tw-h-64">
+          <canvas #categoriasChart></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Indicadores de alerta rápidos -->
+  @if (!isLoading() && resumen()) {
+    <div class="gp-card">
+      <div class="gp-card-header">
+        <div class="tw-flex tw-items-center tw-gap-2">
+          <i class="pi pi-bell tw-text-[#f59e0b]"></i>
+          <h3 class="tw-text-sm tw-font-semibold tw-text-[#1e293b] tw-m-0">
+            Indicadores de Alerta
+          </h3>
+        </div>
+      </div>
+      <div class="gp-card-body tw-grid tw-grid-cols-1 md:tw-grid-cols-3 tw-gap-4">
+
+        <!-- Stock bajo -->
+        <div class="med-alert-warning">
+          <div class="tw-flex tw-items-center tw-justify-between tw-mb-2">
+            <span class="tw-text-sm tw-font-semibold tw-text-[#b45309]">
+              <i class="pi pi-exclamation-triangle tw-mr-1"></i> Stock Bajo
+            </span>
+            <span class="tw-text-lg tw-font-bold tw-text-[#b45309]">
+              {{ resumen()!.stockBajo }}
+            </span>
+          </div>
+          <p-progressbar
+            [value]="(resumen()!.stockBajo / resumen()!.totalMedicamentos) * 100"
+            [showValue]="false"
+            styleClass="tw-h-2"
+            color="#f59e0b" />
+          <span class="tw-text-xs tw-text-[#92400e] tw-mt-1 tw-block">
+            {{ ((resumen()!.stockBajo / resumen()!.totalMedicamentos) * 100) | number:'1.1-1' }}%
+            del inventario
+          </span>
+        </div>
+
+        <!-- Próximos a vencer -->
+        <div class="med-alert-warning">
+          <div class="tw-flex tw-items-center tw-justify-between tw-mb-2">
+            <span class="tw-text-sm tw-font-semibold tw-text-[#92400e]">
+              <i class="pi pi-clock tw-mr-1"></i> Próx. Vencer (30 días)
+            </span>
+            <span class="tw-text-lg tw-font-bold tw-text-[#92400e]">
+              {{ resumen()!.proximosVencer }}
+            </span>
+          </div>
+          <p-progressbar
+            [value]="(resumen()!.proximosVencer / resumen()!.totalMedicamentos) * 100"
+            [showValue]="false"
+            styleClass="tw-h-2"
+            color="#f97316" />
+          <span class="tw-text-xs tw-text-[#92400e] tw-mt-1 tw-block">Requieren revisión urgente</span>
+        </div>
+
+        <!-- Vencidos -->
+        <div class="med-alert-danger">
+          <div class="tw-flex tw-items-center tw-justify-between tw-mb-2">
+            <span class="tw-text-sm tw-font-semibold tw-text-[#dc2626]">
+              <i class="pi pi-times-circle tw-mr-1"></i> Vencidos
+            </span>
+            <span class="tw-text-lg tw-font-bold tw-text-[#dc2626]">
+              {{ resumen()!.vencidos }}
+            </span>
+          </div>
+          <p-progressbar
+            [value]="(resumen()!.vencidos / resumen()!.totalMedicamentos) * 100"
+            [showValue]="false"
+            styleClass="tw-h-2"
+            color="#ef4444" />
+          <span class="tw-text-xs tw-text-[#991b1b] tw-mt-1 tw-block">Dar de baja inmediatamente</span>
+        </div>
+
+      </div>
+    </div>
+  }
+
+</div>

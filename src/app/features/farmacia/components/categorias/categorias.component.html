@@ -1,0 +1,79 @@
+<!-- Categorías de Medicamentos -->
+<p-confirmDialog />
+
+<div class="tw-flex tw-flex-col tw-gap-4">
+  <div class="tw-flex tw-items-center tw-justify-between">
+    <div>
+      <h2 class="tw-text-xl tw-font-bold tw-text-[#1e293b] tw-m-0">Categorías de Medicamentos</h2>
+      <p class="tw-text-sm tw-text-[#64748b] tw-mt-1 tw-mb-0">{{ categorias().length }} categorías registradas</p>
+    </div>
+    <p-button label="Nueva Categoría" icon="pi pi-plus" size="small" (onClick)="abrirNueva()" />
+  </div>
+
+  <div class="gp-card tw-overflow-hidden">
+    <p-table [value]="categorias()" [loading]="isLoading()" [rowHover]="true" styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Color</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th class="tw-text-right">Medicamentos</th>
+          <th class="tw-text-center">Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-cat>
+        <tr>
+          <td>
+            <div class="tw-w-8 tw-h-8 tw-rounded-full tw-border-2 tw-border-white tw-shadow-sm"
+                 [style.background]="cat.color"></div>
+          </td>
+          <td>
+            <span class="tw-font-semibold tw-text-sm" [style.color]="cat.color">{{ cat.nombre }}</span>
+          </td>
+          <td class="tw-text-sm tw-text-[#64748b]">{{ cat.descripcion }}</td>
+          <td class="tw-text-right tw-font-semibold">{{ cat.totalMedicamentos | number }}</td>
+          <td class="tw-text-center">
+            <div class="tw-flex tw-gap-1 tw-justify-center">
+              <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" size="small"
+                        (onClick)="abrirEditar(cat)" pTooltip="Editar" />
+              <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small"
+                        (onClick)="confirmarEliminar(cat)" pTooltip="Eliminar" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- Modal Categoría -->
+<p-dialog
+  [visible]="showModal()"
+  (visibleChange)="showModal.set($event)"
+  [header]="editingId() ? 'Editar Categoría' : 'Nueva Categoría'"
+  [modal]="true" [draggable]="false" [style]="{ width: '440px' }">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="tw-flex tw-flex-col tw-gap-5 tw-pt-2">
+      <p-floatlabel variant="on">
+        <input pInputText id="nombre" formControlName="nombre" class="tw-w-full" />
+        <label for="nombre">Nombre de la categoría *</label>
+      </p-floatlabel>
+      <p-floatlabel variant="on">
+        <textarea pTextarea id="descripcion" formControlName="descripcion" rows="2" class="tw-w-full"></textarea>
+        <label for="descripcion">Descripción</label>
+      </p-floatlabel>
+      <div>
+        <label class="tw-text-xs tw-font-medium tw-text-[#64748b] tw-block tw-mb-2">Color identificador</label>
+        <p-colorpicker formControlName="color" format="hex" />
+        <span class="tw-text-xs tw-text-[#64748b] tw-ml-2">{{ form.get('color')?.value }}</span>
+      </div>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <div class="tw-flex tw-gap-3 tw-justify-end">
+      <p-button label="Cancelar" severity="secondary" outlined (onClick)="showModal.set(false)" />
+      <p-button [label]="editingId() ? 'Actualizar' : 'Crear Categoría'" icon="pi pi-check"
+                [loading]="isSaving()" (onClick)="onSubmit()" />
+    </div>
+  </ng-template>
+</p-dialog>

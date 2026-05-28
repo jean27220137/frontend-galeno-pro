@@ -1,0 +1,257 @@
+/* ============================================================
+   Galenos Pro — Estilos Globales
+   Orden de importación CRÍTICO:
+   1. Tailwind directivas (sin preflight para no conflictuar con PrimeNG)
+   2. PrimeNG tema y overrides
+   3. Estilos propios
+   ============================================================ */
+
+/* 1. Tailwind base sin preflight (preflight=false en tailwind.config.js) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 2. PrimeNG — se importa desde app.config.ts vía providePrimeNG */
+
+/* 3. Variables CSS globales Galenos Pro */
+:root {
+  --gp-blue-primary:    #2378f0;
+  --gp-blue-dark:       #1a5ecb;
+  --gp-blue-light:      #e8f0fe;
+  --gp-cyan-primary:    #00bcd4;
+  --gp-cyan-dark:       #0097a7;
+  --gp-cyan-light:      #e0f7fa;
+  --gp-white:           #ffffff;
+  --gp-bg:              #f4f7fb;
+  --gp-text-primary:    #1e293b;
+  --gp-text-secondary:  #64748b;
+  --gp-border:          #e2e8f0;
+  --gp-success:         #10b981;
+  --gp-warning:         #f59e0b;
+  --gp-danger:          #ef4444;
+  --gp-info:            #3b82f6;
+  --navbar-height:      64px;
+  --sidebar-width:      0px;
+}
+
+/* Reset básico compatible con PrimeNG */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 14px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--gp-bg);
+  color: var(--gp-text-primary);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── PrimeNG Tema Override — Galenos Pro ─────────────────── */
+
+/* Color de acento primario en PrimeNG */
+.p-component {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.875rem;
+}
+
+/* Botones primarios */
+.p-button.p-button-primary,
+.p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-link) {
+  background: var(--gp-blue-primary);
+  border-color: var(--gp-blue-primary);
+}
+.p-button.p-button-primary:hover,
+.p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-link):hover {
+  background: var(--gp-blue-dark);
+  border-color: var(--gp-blue-dark);
+}
+
+/* Navbar Megamenu override */
+.p-megamenu {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+.p-megamenu .p-megamenu-root-list > .p-menuitem > .p-menuitem-link {
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.375rem;
+  color: #e2e8f0;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+}
+.p-megamenu .p-megamenu-root-list > .p-menuitem > .p-menuitem-link:hover,
+.p-megamenu .p-megamenu-root-list > .p-menuitem.p-menuitem-active > .p-menuitem-link {
+  background: rgba(255,255,255,0.15);
+  color: #ffffff;
+}
+.p-megamenu-panel {
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 40px rgba(35,120,240,.18);
+  border: 1px solid var(--gp-border);
+}
+
+/* DataTable salud */
+.p-datatable .p-datatable-thead > tr > th {
+  background: var(--gp-blue-light);
+  color: var(--gp-blue-dark);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-color: var(--gp-border);
+}
+.p-datatable .p-datatable-tbody > tr:hover {
+  background: #f0f7ff;
+}
+.p-datatable .p-datatable-tbody > tr > td {
+  border-color: var(--gp-border);
+}
+
+/* Cards */
+.p-card {
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,.07);
+  border: 1px solid var(--gp-border);
+}
+
+/* Dialog / Modal */
+.p-dialog {
+  border-radius: 0.875rem;
+  box-shadow: 0 20px 60px rgba(35,120,240,.20);
+}
+.p-dialog .p-dialog-header {
+  background: linear-gradient(135deg, var(--gp-blue-primary), var(--gp-cyan-primary));
+  color: white;
+  border-radius: 0.875rem 0.875rem 0 0;
+  padding: 1.25rem 1.5rem;
+}
+.p-dialog .p-dialog-header .p-dialog-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+.p-dialog .p-dialog-header .p-dialog-header-icon {
+  color: white;
+}
+.p-dialog .p-dialog-header .p-dialog-header-icon:hover {
+  background: rgba(255,255,255,.2);
+  color: white;
+}
+.p-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+.p-dialog .p-dialog-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--gp-border);
+}
+
+/* Tags / Badges */
+.p-tag.p-tag-danger   { background: #fee2e2; color: #dc2626; }
+.p-tag.p-tag-warning  { background: #fef9c3; color: #b45309; }
+.p-tag.p-tag-success  { background: #dcfce7; color: #15803d; }
+.p-tag.p-tag-info     { background: #dbeafe; color: #1d4ed8; }
+
+/* Toast */
+.p-toast .p-toast-message.p-toast-message-success {
+  background: #f0fdf4;
+  border-left: 4px solid var(--gp-success);
+}
+.p-toast .p-toast-message.p-toast-message-error {
+  background: #fef2f2;
+  border-left: 4px solid var(--gp-danger);
+}
+.p-toast .p-toast-message.p-toast-message-warn {
+  background: #fffbeb;
+  border-left: 4px solid var(--gp-warning);
+}
+
+/* InputText */
+.p-inputtext:focus {
+  border-color: var(--gp-blue-primary);
+  box-shadow: 0 0 0 2px rgba(35,120,240,.15);
+}
+
+/* ─── Utilitarios propios ──────────────────────────────────── */
+
+.gp-page-container {
+  padding: 1.5rem;
+  min-height: calc(100vh - var(--navbar-height));
+}
+
+.gp-card {
+  background: white;
+  border-radius: 0.75rem;
+  border: 1px solid var(--gp-border);
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+
+.gp-card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--gp-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gp-card-body {
+  padding: 1.5rem;
+}
+
+/* Alerta visual medicamentos */
+.med-alert-danger {
+  background: #fef2f2;
+  border-left: 4px solid #ef4444;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+}
+.med-alert-warning {
+  background: #fffbeb;
+  border-left: 4px solid #f59e0b;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+}
+.med-alert-ok {
+  background: #f0fdf4;
+  border-left: 4px solid #10b981;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+}
+
+/* Row de stock */
+.stock-row-critical  { background: #fff5f5 !important; }
+.stock-row-warning   { background: #fffef0 !important; }
+.stock-row-ok        { background: #f0fff8 !important; }
+
+/* p-password alineado al 100% en login */
+.login-field .p-password {
+  width: 100%;
+}
+.login-field .p-password input {
+  width: 100%;
+}
+
+/* Scrollbar estilizado */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.gp-fade-in { animation: fadeIn 0.25s ease-out; }
+
+@keyframes pulse-badge {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.08); }
+}
+.pulse-badge { animation: pulse-badge 2s infinite; }

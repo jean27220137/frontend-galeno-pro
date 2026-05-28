@@ -1,0 +1,163 @@
+<!-- ═══════════════════════════════════════════════════════════
+     Alertas de Vencimiento — Galenos Pro Farmacia
+     ═══════════════════════════════════════════════════════════ -->
+<div class="tw-flex tw-flex-col tw-gap-6">
+
+  <!-- Encabezado -->
+  <div>
+    <h2 class="tw-text-xl tw-font-bold tw-text-[#1e293b] tw-m-0">Alertas de Vencimiento</h2>
+    <p class="tw-text-sm tw-text-[#64748b] tw-mt-1 tw-mb-0">
+      Medicamentos que requieren atención inmediata por vencimiento
+    </p>
+  </div>
+
+  <!-- Resumen visual -->
+  @if (!isLoading()) {
+    <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-3 tw-gap-4">
+      <div class="med-alert-danger">
+        <div class="tw-flex tw-items-center tw-justify-between">
+          <span class="tw-font-semibold tw-text-red-700">
+            <i class="pi pi-times-circle tw-mr-2"></i>Vencidos
+          </span>
+          <span class="tw-text-2xl tw-font-bold tw-text-red-600">{{ vencidos().length }}</span>
+        </div>
+        <p class="tw-text-xs tw-text-red-600 tw-mt-1 tw-mb-0">Dar de baja inmediatamente</p>
+      </div>
+      <div class="med-alert-warning" style="border-color:#f97316; background:#fff7ed">
+        <div class="tw-flex tw-items-center tw-justify-between">
+          <span class="tw-font-semibold tw-text-orange-700">
+            <i class="pi pi-exclamation-circle tw-mr-2"></i>Críticos (&lt; 15 días)
+          </span>
+          <span class="tw-text-2xl tw-font-bold tw-text-orange-600">{{ criticos().length }}</span>
+        </div>
+        <p class="tw-text-xs tw-text-orange-600 tw-mt-1 tw-mb-0">Revisión y gestión urgente</p>
+      </div>
+      <div class="med-alert-warning">
+        <div class="tw-flex tw-items-center tw-justify-between">
+          <span class="tw-font-semibold tw-text-amber-700">
+            <i class="pi pi-clock tw-mr-2"></i>Próximos (15-30 días)
+          </span>
+          <span class="tw-text-2xl tw-font-bold tw-text-amber-600">{{ proximos().length }}</span>
+        </div>
+        <p class="tw-text-xs tw-text-amber-600 tw-mt-1 tw-mb-0">Planificar devolución o consumo</p>
+      </div>
+    </div>
+  }
+
+  <!-- Listado por nivel de alerta -->
+
+  <!-- VENCIDOS -->
+  @if (vencidos().length > 0) {
+    <div class="gp-card">
+      <div class="gp-card-header" style="background:#fff5f5; border-color:#fca5a5">
+        <div class="tw-flex tw-items-center tw-gap-2">
+          <i class="pi pi-times-circle tw-text-red-500 tw-text-lg"></i>
+          <h3 class="tw-text-sm tw-font-bold tw-text-red-700 tw-m-0">VENCIDOS — Baja Inmediata</h3>
+        </div>
+        <p-tag severity="danger" [value]="vencidos().length + ' medicamentos'" />
+      </div>
+      <div class="gp-card-body tw-flex tw-flex-col tw-gap-3">
+        @for (med of vencidos(); track med.loteId) {
+          <ng-container *ngTemplateOutlet="medCard; context: { $implicit: med, tipo: 'danger' }" />
+        }
+      </div>
+    </div>
+  }
+
+  <!-- CRÍTICOS -->
+  @if (criticos().length > 0) {
+    <div class="gp-card">
+      <div class="gp-card-header" style="background:#fff7ed; border-color:#fdba74">
+        <div class="tw-flex tw-items-center tw-gap-2">
+          <i class="pi pi-exclamation-circle tw-text-orange-500 tw-text-lg"></i>
+          <h3 class="tw-text-sm tw-font-bold tw-text-orange-700 tw-m-0">CRÍTICOS — Menos de 15 días</h3>
+        </div>
+        <p-tag severity="warn" [value]="criticos().length + ' medicamentos'" />
+      </div>
+      <div class="gp-card-body tw-flex tw-flex-col tw-gap-3">
+        @for (med of criticos(); track med.loteId) {
+          <ng-container *ngTemplateOutlet="medCard; context: { $implicit: med, tipo: 'warning' }" />
+        }
+      </div>
+    </div>
+  }
+
+  <!-- PRÓXIMOS -->
+  @if (proximos().length > 0) {
+    <div class="gp-card">
+      <div class="gp-card-header" style="background:#fffbeb; border-color:#fde68a">
+        <div class="tw-flex tw-items-center tw-gap-2">
+          <i class="pi pi-clock tw-text-amber-500 tw-text-lg"></i>
+          <h3 class="tw-text-sm tw-font-bold tw-text-amber-700 tw-m-0">PRÓXIMOS A VENCER — 15-30 días</h3>
+        </div>
+        <p-tag severity="warn" [value]="proximos().length + ' medicamentos'" />
+      </div>
+      <div class="gp-card-body tw-flex tw-flex-col tw-gap-3">
+        @for (med of proximos(); track med.loteId) {
+          <ng-container *ngTemplateOutlet="medCard; context: { $implicit: med, tipo: 'info' }" />
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Estado vacío -->
+  @if (!isLoading() && allLotes().length === 0) {
+    <div class="gp-card tw-p-16 tw-flex tw-flex-col tw-items-center tw-text-[#94a3b8]">
+      <i class="pi pi-check-circle tw-text-5xl tw-text-green-500 tw-mb-4"></i>
+      <h3 class="tw-font-semibold tw-text-[#1e293b] tw-mb-1">Sin alertas activas</h3>
+      <p class="tw-text-sm tw-m-0">Todos los medicamentos están dentro de su período de vigencia</p>
+    </div>
+  }
+
+  <!-- Skeleton -->
+  @if (isLoading()) {
+    <div class="tw-flex tw-flex-col tw-gap-3">
+      @for (i of [1,2,3,4]; track i) {
+        <p-skeleton height="72px" borderRadius="0.75rem" />
+      }
+    </div>
+  }
+
+</div>
+
+<!-- Template reutilizable: tarjeta de medicamento alerta -->
+<ng-template #medCard let-med let-tipo="tipo">
+  <div class="tw-flex tw-items-center tw-justify-between tw-p-3 tw-rounded-xl tw-border"
+       [class.tw-bg-red-50]="tipo === 'danger'"
+       [class.tw-border-red-200]="tipo === 'danger'"
+       [class.tw-bg-orange-50]="tipo === 'warning'"
+       [class.tw-border-orange-200]="tipo === 'warning'"
+       [class.tw-bg-amber-50]="tipo === 'info'"
+       [class.tw-border-amber-200]="tipo === 'info'">
+    <div class="tw-flex tw-items-center tw-gap-3">
+      <div class="tw-w-10 tw-h-10 tw-rounded-lg tw-flex tw-items-center tw-justify-center"
+           [class.tw-bg-red-100]="tipo === 'danger'"
+           [class.tw-bg-orange-100]="tipo === 'warning'"
+           [class.tw-bg-amber-100]="tipo === 'info'">
+        <i class="pi pi-box tw-text-base"
+           [class.tw-text-red-500]="tipo === 'danger'"
+           [class.tw-text-orange-500]="tipo === 'warning'"
+           [class.tw-text-amber-500]="tipo === 'info'"></i>
+      </div>
+      <div>
+        <div class="tw-font-semibold tw-text-sm tw-text-[#1e293b]">{{ med.nombreProducto }}</div>
+        <div class="tw-text-xs tw-text-[#64748b]">
+          Lote: {{ med.numeroLote }} · Disponible: {{ med.cantidadDisponible | number }}
+        </div>
+      </div>
+    </div>
+    <div class="tw-text-right tw-flex-shrink-0">
+      <div class="tw-font-bold tw-text-sm"
+           [class.tw-text-red-600]="tipo === 'danger'"
+           [class.tw-text-orange-600]="tipo === 'warning'"
+           [class.tw-text-amber-600]="tipo === 'info'">
+        @if (tipo === 'danger') {
+          VENCIDO
+        } @else {
+          {{ getDiasRestantes(med.fechaVencimiento) }} días
+        }
+      </div>
+      <div class="tw-text-xs tw-text-[#94a3b8]">{{ med.fechaVencimiento | date:'dd/MM/yyyy' }}</div>
+    </div>
+  </div>
+</ng-template>

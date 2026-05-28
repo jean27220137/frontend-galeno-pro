@@ -1,0 +1,147 @@
+<!-- ═══════════════════════════════════════════════════════════
+     Movimientos de Inventario — Galenos Pro Farmacia
+     ═══════════════════════════════════════════════════════════ -->
+<div class="tw-flex tw-flex-col tw-gap-4">
+
+  <!-- Encabezado -->
+  <div class="tw-flex tw-items-start tw-justify-between tw-flex-wrap tw-gap-3">
+    <div>
+      <h2 class="tw-text-lg sm:tw-text-xl tw-font-bold tw-text-[#1e293b] tw-m-0">Movimientos de Inventario</h2>
+      <p class="tw-text-sm tw-text-[#64748b] tw-mt-1 tw-mb-0">
+        {{ totalRecords() | number }} movimiento(s) registrado(s)
+      </p>
+    </div>
+  </div>
+
+  <!-- Filtro -->
+  <div class="gp-card tw-p-4">
+    <div class="tw-flex tw-flex-wrap tw-gap-3 tw-items-end">
+      <div class="tw-min-w-[180px]">
+        <label class="tw-text-xs tw-font-medium tw-text-[#64748b] tw-block tw-mb-1.5">Tipo de movimiento</label>
+        <p-select
+          [(ngModel)]="filtroTipo"
+          [options]="opcionesTipo"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Todos"
+          (onChange)="onFilterChange()"
+          styleClass="tw-w-full" />
+      </div>
+      <p-button
+        label="Limpiar"
+        icon="pi pi-filter-slash"
+        severity="secondary"
+        outlined
+        size="small"
+        (onClick)="filtroTipo = null; onFilterChange()" />
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="gp-card tw-overflow-hidden">
+    <p-table
+      [value]="movimientos()"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="rows"
+      [totalRecords]="totalRecords()"
+      [loading]="isLoading()"
+      [first]="first"
+      (onPage)="onPageChange($event)"
+      [rowHover]="true"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      sortMode="single"
+      scrollable
+      scrollHeight="calc(100vh - 360px)"
+      styleClass="p-datatable-sm">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width:110px">Tipo</th>
+          <th style="min-width:120px">Fecha</th>
+          <th style="min-width:240px">Productos</th>
+          <th style="min-width:90px; text-align:right">Total Uds.</th>
+          <th style="min-width:200px">Observación</th>
+          <th style="min-width:110px">Documento</th>
+          <th style="min-width:130px">Usuario</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-mov>
+        <tr>
+
+          <!-- Tipo -->
+          <td>
+            <p-tag
+              [severity]="getSeverity(mov.tipoMovimiento)"
+              styleClass="tw-flex tw-items-center tw-gap-1 tw-text-xs">
+              <i [class]="getIcon(mov.tipoMovimiento) + ' tw-text-xs'"></i>
+              {{ mov.tipoMovimiento }}
+            </p-tag>
+          </td>
+
+          <!-- Fecha -->
+          <td>
+            <div class="tw-text-sm tw-text-[#1e293b]">{{ mov.fecha | date:'dd/MM/yyyy' }}</div>
+            <div class="tw-text-xs tw-text-[#94a3b8]">{{ mov.fecha | date:'HH:mm' }}</div>
+          </td>
+
+          <!-- Productos (detalles) -->
+          <td>
+            @for (d of mov.detalles; track d.id) {
+              <div class="tw-text-sm tw-font-medium tw-text-[#1e293b] tw-leading-tight">
+                {{ d.nombreProducto }}
+              </div>
+              <div class="tw-text-xs tw-text-[#94a3b8] tw-mb-1">
+                Lote: {{ d.numeroLote }} · {{ d.cantidad | number }} uds.
+              </div>
+            }
+            @if (!mov.detalles || mov.detalles.length === 0) {
+              <span class="tw-text-xs tw-text-[#94a3b8]">Sin detalle</span>
+            }
+          </td>
+
+          <!-- Total cantidad -->
+          <td class="tw-text-right">
+            <span class="tw-font-semibold tw-text-sm"
+                  [class.tw-text-green-600]="mov.tipoMovimiento === 'ENTRADA'"
+                  [class.tw-text-red-600]="mov.tipoMovimiento === 'SALIDA'">
+              {{ mov.tipoMovimiento === 'SALIDA' ? '-' : '+' }}{{ totalCantidad(mov) | number }}
+            </span>
+          </td>
+
+          <!-- Observación -->
+          <td>
+            <span class="tw-text-sm tw-text-[#475569]" [title]="mov.observacion ?? ''">
+              {{ (mov.observacion ?? '—') | slice:0:50 }}{{ (mov.observacion?.length ?? 0) > 50 ? '…' : '' }}
+            </span>
+          </td>
+
+          <!-- Documento -->
+          <td>
+            <code class="tw-text-xs tw-text-[#64748b]">{{ mov.numeroDocumento ?? '—' }}</code>
+          </td>
+
+          <!-- Usuario -->
+          <td class="tw-text-sm tw-text-[#64748b]">{{ mov.usuarioId }}</td>
+
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7">
+            <div class="tw-flex tw-flex-col tw-items-center tw-py-16 tw-text-[#94a3b8]">
+              <i class="pi pi-arrow-right-arrow-left tw-text-5xl tw-mb-4"></i>
+              <p class="tw-m-0 tw-font-medium">No hay movimientos registrados</p>
+              <p class="tw-text-sm tw-mt-1">Los movimientos de entradas y salidas aparecerán aquí</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+    </p-table>
+  </div>
+</div>

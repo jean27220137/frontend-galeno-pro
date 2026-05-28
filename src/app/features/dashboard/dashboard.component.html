@@ -1,0 +1,83 @@
+<!-- Dashboard Principal — Galenos Pro -->
+<div class="tw-flex tw-flex-col tw-gap-6 gp-fade-in">
+
+  <!-- Bienvenida -->
+  <div class="tw-flex tw-items-center tw-justify-between tw-flex-wrap tw-gap-3">
+    <div>
+      <h1 class="tw-text-2xl tw-font-bold tw-text-[#1e293b] tw-m-0">
+        Bienvenido, {{ authService.currentUser()?.fullName?.split(' ')?.at(0) ?? '' }}
+      </h1>
+      <p class="tw-text-sm tw-text-[#64748b] tw-mt-1 tw-mb-0">
+        {{ today | date:"EEEE, dd 'de' MMMM 'de' yyyy" }} · Sistema Galenos Pro
+      </p>
+    </div>
+    <p-tag
+      [value]="'Rol: ' + (authService.userRole() ?? '')"
+      severity="info"
+      icon="pi pi-shield" />
+  </div>
+
+  <!-- KPI Stats -->
+  <div class="tw-grid tw-grid-cols-2 md:tw-grid-cols-3 xl:tw-grid-cols-6 tw-gap-4">
+    @for (stat of stats(); track stat.label) {
+      <a [routerLink]="stat.routerLink"
+         class="gp-card tw-p-4 tw-flex tw-flex-col tw-gap-2 tw-no-underline tw-cursor-pointer
+                hover:tw-shadow-md tw-transition-all tw-group">
+        <div class="tw-w-10 tw-h-10 tw-rounded-xl tw-flex tw-items-center tw-justify-center
+                    tw-transition-transform group-hover:tw-scale-110"
+             [style.background]="stat.bg">
+          <i [class]="stat.icon + ' tw-text-lg'" [style.color]="stat.color"></i>
+        </div>
+        <div class="tw-text-2xl tw-font-bold" [style.color]="stat.color">
+          @if (stat.isMoneda) { S/. {{ stat.value | number:'1.0-0' }} }
+          @else { {{ stat.value | number }} }
+        </div>
+        <div class="tw-text-xs tw-text-[#64748b] tw-font-medium">{{ stat.label }}</div>
+      </a>
+    }
+  </div>
+
+  <!-- Gráfico + Accesos rápidos -->
+  <div class="tw-grid tw-grid-cols-1 xl:tw-grid-cols-3 tw-gap-6">
+
+    <!-- Gráfico actividad semanal -->
+    <div class="gp-card xl:tw-col-span-2">
+      <div class="gp-card-header">
+        <span class="tw-flex tw-items-center tw-gap-2 tw-text-sm tw-font-semibold tw-text-[#1e293b]">
+          <i class="pi pi-chart-bar tw-text-[#2378f0]"></i> Actividad Semanal
+        </span>
+      </div>
+      <div class="gp-card-body">
+        <div class="tw-h-64"><canvas #activityChart></canvas></div>
+      </div>
+    </div>
+
+    <!-- Accesos rápidos -->
+    <div class="gp-card">
+      <div class="gp-card-header">
+        <span class="tw-flex tw-items-center tw-gap-2 tw-text-sm tw-font-semibold tw-text-[#1e293b]">
+          <i class="pi pi-bolt tw-text-[#00bcd4]"></i> Accesos Rápidos
+        </span>
+      </div>
+      <div class="gp-card-body tw-grid tw-grid-cols-2 tw-gap-2">
+        @for (acc of accesosRapidos; track acc.label) {
+          <a [routerLink]="acc.link"
+             class="tw-flex tw-flex-col tw-items-center tw-gap-2 tw-p-3 tw-rounded-xl
+                    tw-border tw-border-[#e2e8f0] tw-no-underline tw-transition-all
+                    hover:tw-shadow-md hover:tw-scale-105"
+             [style.border-color]="acc.color + '33'"
+             [style.background]="acc.color + '08'">
+            <div class="tw-w-10 tw-h-10 tw-rounded-xl tw-flex tw-items-center tw-justify-center"
+                 [style.background]="acc.color + '18'">
+              <i [class]="acc.icon + ' tw-text-lg'" [style.color]="acc.color"></i>
+            </div>
+            <span class="tw-text-xs tw-font-medium tw-text-center tw-text-[#475569] tw-leading-tight">
+              {{ acc.label }}
+            </span>
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+
+</div>

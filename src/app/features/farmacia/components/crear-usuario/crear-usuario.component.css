@@ -1,0 +1,450 @@
+/* ── Wrapper centrado ───────────────────────────────────── */
+.cu-page {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: #f1f5f9;
+}
+
+/* ── Card principal ─────────────────────────────────────── */
+.cu-card {
+  width: 100%;
+  max-width: 680px;
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow:
+    0 4px 6px -1px rgba(0,0,0,.07),
+    0 10px 24px -4px rgba(0,0,0,.06);
+  overflow: hidden;
+}
+
+/* ── Header de la card ─────────────────────────────────── */
+.cu-card__header {
+  background: linear-gradient(135deg, #2378f0 0%, #1a5fd4 100%);
+  padding: 1.75rem 2rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.cu-card__header::after {
+  content: '';
+  position: absolute;
+  right: -40px;
+  top: -40px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.08);
+}
+
+.cu-card__header::before {
+  content: '';
+  position: absolute;
+  right: 40px;
+  bottom: -60px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.05);
+}
+
+.cu-header__icon {
+  width: 3rem;
+  height: 3rem;
+  background: rgba(255,255,255,.2);
+  border-radius: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  backdrop-filter: blur(4px);
+  z-index: 1;
+}
+
+.cu-header__icon i {
+  font-size: 1.375rem;
+  color: #fff;
+}
+
+.cu-header__text {
+  z-index: 1;
+}
+
+.cu-header__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.cu-header__subtitle {
+  font-size: 0.8125rem;
+  color: rgba(255,255,255,.75);
+  margin: 0.25rem 0 0;
+}
+
+.cu-header__badge {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+  z-index: 1;
+}
+
+/* ── Body del formulario ──────────────────────────────── */
+.cu-card__body {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Sección ──────────────────────────────────────────── */
+.cu-section__label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  margin-bottom: 1rem;
+}
+
+.cu-section__label i {
+  font-size: 0.75rem;
+}
+
+/* ── Grid de campos ──────────────────────────────────── */
+.cu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.cu-grid--full {
+  grid-column: 1 / -1;
+}
+
+/* ── Campo individual ────────────────────────────────── */
+.cu-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.cu-field__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.cu-field__error {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #ef4444;
+  animation: cu-shake 0.25s ease;
+}
+
+@keyframes cu-shake {
+  0%, 100% { transform: translateX(0); }
+  33%       { transform: translateX(-4px); }
+  66%       { transform: translateX(4px); }
+}
+
+/* ── Chips de roles ──────────────────────────────────── */
+.cu-roles-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+}
+
+.cu-role-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 2px solid #e2e8f0;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-align: left;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.cu-role-chip:hover:not(.cu-role-chip--active) {
+  border-color: #bfdbfe;
+  background: #f0f7ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(35,120,240,.1);
+}
+
+.cu-role-chip--active {
+  border-color: #2378f0;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  box-shadow: 0 0 0 3px rgba(35,120,240,.12);
+}
+
+.cu-role-chip__icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.18s;
+}
+
+.cu-role-chip--active .cu-role-chip__icon {
+  background: #2378f0;
+}
+
+.cu-role-chip__icon i {
+  font-size: 0.875rem;
+  color: #64748b;
+  transition: color 0.18s;
+}
+
+.cu-role-chip--active .cu-role-chip__icon i {
+  color: #fff;
+}
+
+.cu-role-chip__text {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #475569;
+  transition: color 0.18s;
+  flex: 1;
+}
+
+.cu-role-chip--active .cu-role-chip__text {
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.cu-role-chip__check {
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  background: #2378f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  animation: cu-pop 0.2s ease;
+}
+
+.cu-role-chip__check i {
+  font-size: 0.625rem;
+  color: #fff;
+}
+
+@keyframes cu-pop {
+  0%   { transform: scale(0); }
+  70%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* ── Divider con texto ───────────────────────────────── */
+.cu-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #cbd5e1;
+  font-size: 0.6875rem;
+}
+
+.cu-divider::before,
+.cu-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+/* ── Step indicator ──────────────────────────────────── */
+.cu-steps {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.5rem 2rem 0;
+  gap: 0;
+}
+
+.cu-step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  flex: 1;
+  position: relative;
+}
+
+.cu-step-connector {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: #e2e8f0;
+  z-index: 0;
+  transition: background 0.3s;
+}
+
+.cu-step-item--done .cu-step-connector {
+  background: #2378f0;
+}
+
+.cu-step-bubble {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 2px solid #e2e8f0;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+
+.cu-step-bubble i {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  transition: color 0.2s;
+}
+
+.cu-step-item--active .cu-step-bubble {
+  border-color: #2378f0;
+  background: #2378f0;
+  box-shadow: 0 0 0 4px rgba(35,120,240,.18);
+}
+
+.cu-step-item--active .cu-step-bubble i {
+  color: #fff;
+}
+
+.cu-step-item--done .cu-step-bubble {
+  border-color: #10b981;
+  background: #10b981;
+}
+
+.cu-step-item--done .cu-step-bubble i {
+  color: #fff;
+}
+
+.cu-step-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-align: center;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.cu-step-item--active .cu-step-label {
+  color: #2378f0;
+}
+
+.cu-step-item--done .cu-step-label {
+  color: #10b981;
+}
+
+/* ── Progress bar ────────────────────────────────────── */
+.cu-progress {
+  height: 3px;
+  background: #e2e8f0;
+  margin: 1rem 2rem 0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.cu-progress__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2378f0, #10b981);
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+/* ── Badges opcionales ───────────────────────────────── */
+.cu-required-badge {
+  margin-left: 0.4rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #ef4444;
+  background: #fee2e2;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+}
+
+.cu-optional-badge {
+  margin-left: 0.4rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+}
+
+.cu-field__hint {
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+/* ── Footer de botones ───────────────────────────────── */
+.cu-card__footer {
+  padding: 1.25rem 2rem 1.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.cu-footer__nav {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* ── Indicador de fortaleza custom ──────────────────── */
+.cu-strength-bar {
+  display: flex;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.cu-strength-bar__seg {
+  flex: 1;
+  height: 3px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  transition: background 0.3s;
+}
+
+.cu-strength-bar__seg--weak   { background: #ef4444; }
+.cu-strength-bar__seg--medium { background: #f59e0b; }
+.cu-strength-bar__seg--strong { background: #10b981; }

@@ -1,0 +1,204 @@
+<p-confirmDialog />
+
+<div class="tw-flex tw-flex-col tw-gap-5">
+
+  <!-- Encabezado -->
+  <div class="tw-flex tw-items-center tw-justify-between tw-flex-wrap tw-gap-3">
+    <div class="tw-flex tw-items-center tw-gap-3">
+      <div class="tw-w-11 tw-h-11 tw-rounded-xl tw-bg-blue-100 tw-flex tw-items-center tw-justify-center">
+        <i class="pi pi-users tw-text-[#2378f0] tw-text-lg"></i>
+      </div>
+      <div>
+        <h2 class="tw-text-xl tw-font-bold tw-text-[#1e293b] tw-m-0">Gestión de Usuarios</h2>
+        <p class="tw-text-sm tw-text-[#64748b] tw-mt-0.5 tw-mb-0">
+          {{ usuariosFiltrados().length }} usuario(s) registrado(s)
+        </p>
+      </div>
+    </div>
+
+    <!-- Buscador -->
+    <p-iconfield>
+      <p-inputicon class="pi pi-search" />
+      <input pInputText
+             placeholder="Buscar por nombre o usuario..."
+             [value]="searchText()"
+             (input)="searchText.set($any($event.target).value)"
+             class="tw-w-64" />
+    </p-iconfield>
+  </div>
+
+  <!-- Tabla -->
+  <div class="gp-card tw-overflow-hidden">
+    <p-table
+      [value]="usuariosFiltrados()"
+      [loading]="isLoading()"
+      [rowHover]="true"
+      styleClass="p-datatable-sm"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="{first}–{last} de {totalRecords}">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Usuario</th>
+          <th>Nombre completo</th>
+          <th>Roles</th>
+          <th class="tw-text-center">Estado</th>
+          <th class="tw-text-center">Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-u>
+        <tr [class.tw-opacity-50]="u.estado !== 'ACTIVO'">
+          <!-- Usuario -->
+          <td>
+            <div class="tw-flex tw-items-center tw-gap-2">
+              <div class="tw-w-8 tw-h-8 tw-rounded-full tw-bg-gradient-to-br
+                           tw-from-blue-400 tw-to-blue-600
+                           tw-flex tw-items-center tw-justify-center tw-flex-shrink-0">
+                <span class="tw-text-white tw-text-xs tw-font-bold">
+                  {{ u.username.charAt(0).toUpperCase() }}
+                </span>
+              </div>
+              <span class="tw-font-mono tw-text-sm tw-font-medium tw-text-[#1e293b]">
+                &#64;{{ u.username }}
+              </span>
+            </div>
+          </td>
+
+          <!-- Nombre -->
+          <td class="tw-text-sm tw-font-medium tw-text-[#334155]">
+            {{ u.nombres }} {{ u.apellidoPaterno }} {{ u.apellidoMaterno }}
+          </td>
+
+          <!-- Roles -->
+          <td>
+            <div class="tw-flex tw-flex-wrap tw-gap-1">
+              @for (rol of u.roles; track rol) {
+                <p-tag [value]="getRolLabel(rol)"
+                       [severity]="getRolSeverity(rol)"
+                       styleClass="tw-text-xs" />
+              }
+            </div>
+          </td>
+
+          <!-- Estado -->
+          <td class="tw-text-center">
+            <p-tag
+              [value]="u.estado"
+              [severity]="u.estado === 'ACTIVO' ? 'success' : u.estado === 'SUSPENDIDO' ? 'danger' : u.estado === 'VACACIONES' ? 'warn' : 'secondary'"
+              styleClass="tw-text-xs" />
+          </td>
+
+          <!-- Acciones -->
+          <td>
+            <div class="tw-flex tw-gap-1 tw-justify-center">
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true" [text]="true"
+                severity="secondary" size="small"
+                (onClick)="abrirEditar(u)"
+                pTooltip="Editar roles" />
+              <p-button
+                [icon]="u.estado === 'ACTIVO' ? 'pi pi-ban' : 'pi pi-check-circle'"
+                [rounded]="true" [text]="true"
+                [severity]="u.estado === 'ACTIVO' ? 'warn' : 'success'"
+                size="small"
+                (onClick)="toggleEstado(u)"
+                [pTooltip]="u.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'" />
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true" [text]="true"
+                severity="danger" size="small"
+                (onClick)="confirmarEliminar(u)"
+                pTooltip="Eliminar usuario" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="tw-text-center tw-py-12 tw-text-[#94a3b8]">
+            <i class="pi pi-users tw-text-4xl tw-block tw-mb-3"></i>
+            <span class="tw-text-sm">No se encontraron usuarios</span>
+          </td>
+        </tr>
+      </ng-template>
+
+    </p-table>
+  </div>
+</div>
+
+<!-- ── Modal editar roles ── -->
+<p-dialog
+  [visible]="showModal()"
+  (visibleChange)="showModal.set($event)"
+  header="Editar roles del usuario"
+  [modal]="true" [draggable]="false" [style]="{ width: '440px' }">
+
+  @if (editingUser(); as u) {
+    <div class="tw-flex tw-flex-col tw-gap-5 tw-pt-2">
+
+      <!-- Info del usuario -->
+      <div class="tw-flex tw-items-center tw-gap-3 tw-p-3 tw-rounded-lg tw-bg-slate-50 tw-border tw-border-slate-200">
+        <div class="tw-w-10 tw-h-10 tw-rounded-full tw-bg-gradient-to-br
+                     tw-from-blue-400 tw-to-blue-600
+                     tw-flex tw-items-center tw-justify-center tw-flex-shrink-0">
+          <span class="tw-text-white tw-font-bold">{{ u.username.charAt(0).toUpperCase() }}</span>
+        </div>
+        <div>
+          <p class="tw-font-semibold tw-text-[#1e293b] tw-m-0 tw-text-sm">{{ u.nombres }} {{ u.apellidoPaterno }}</p>
+          <p class="tw-text-xs tw-text-[#64748b] tw-m-0">&#64;{{ u.username }}</p>
+        </div>
+      </div>
+
+      <p-divider>
+        <span class="tw-text-xs tw-text-[#94a3b8] tw-font-semibold tw-uppercase tw-tracking-wide">
+          Roles asignados
+        </span>
+      </p-divider>
+
+      <!-- Chips de roles -->
+      <div class="tw-flex tw-flex-wrap tw-gap-2">
+        @for (rol of rolesDisponibles; track rol.value) {
+          <button type="button"
+            class="tw-inline-flex tw-items-center tw-gap-1.5 tw-px-3 tw-py-2 tw-rounded-full
+                   tw-border tw-text-xs tw-font-medium tw-cursor-pointer tw-transition-all tw-duration-150"
+            [class.tw-bg-blue-600]="rolesSeleccionados().includes(rol.value)"
+            [class.tw-text-white]="rolesSeleccionados().includes(rol.value)"
+            [class.tw-border-blue-600]="rolesSeleccionados().includes(rol.value)"
+            [class.tw-bg-white]="!rolesSeleccionados().includes(rol.value)"
+            [class.tw-text-slate-600]="!rolesSeleccionados().includes(rol.value)"
+            [class.tw-border-slate-300]="!rolesSeleccionados().includes(rol.value)"
+            (click)="toggleRol(rol.value)">
+            <i [class]="rol.icon"></i>
+            {{ rol.label }}
+            @if (rolesSeleccionados().includes(rol.value)) {
+              <i class="pi pi-check"></i>
+            }
+          </button>
+        }
+      </div>
+
+      @if (rolesSeleccionados().length === 0) {
+        <small class="tw-text-red-500 tw-text-xs">
+          <i class="pi pi-exclamation-circle tw-mr-1"></i>Debes seleccionar al menos un rol
+        </small>
+      }
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="tw-flex tw-gap-3 tw-justify-end">
+      <p-button label="Cancelar" severity="secondary" [outlined]="true"
+                (onClick)="showModal.set(false)" />
+      <p-button label="Guardar cambios" icon="pi pi-check"
+                [loading]="isSaving()"
+                [disabled]="rolesSeleccionados().length === 0"
+                (onClick)="guardarRoles()" />
+    </div>
+  </ng-template>
+</p-dialog>

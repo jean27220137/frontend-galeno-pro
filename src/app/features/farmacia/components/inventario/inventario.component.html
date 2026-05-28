@@ -1,0 +1,375 @@
+<!-- ═══════════════════════════════════════════════════════════
+     Inventario de Medicamentos — Galenos Pro Farmacia
+     ═══════════════════════════════════════════════════════════ -->
+<div class="tw-flex tw-flex-col tw-gap-4">
+
+  <!-- Encabezado -->
+  <div class="tw-flex tw-items-start tw-justify-between tw-flex-wrap tw-gap-3">
+    <div>
+      <h2 class="tw-text-lg sm:tw-text-xl tw-font-bold tw-text-[#1e293b] tw-m-0">Inventario de Medicamentos</h2>
+      <p class="tw-text-sm tw-text-[#64748b] tw-mt-1 tw-mb-0">
+        {{ totalRecords() | number }} medicamento(s) registrado(s)
+      </p>
+    </div>
+    <div class="tw-flex tw-flex-wrap tw-gap-2">
+      <p-button
+        label="Exportar"
+        icon="pi pi-download"
+        severity="secondary"
+        outlined
+        size="small" />
+      <p-button
+        label="Nuevo Medicamento"
+        icon="pi pi-plus"
+        size="small"
+        (onClick)="abrirNuevo()" />
+    </div>
+  </div>
+
+  <!-- Filtros y búsqueda -->
+  <div class="gp-card tw-p-4">
+    <div class="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-flex tw-flex-wrap tw-gap-3 tw-items-end">
+
+      <!-- Búsqueda texto libre -->
+      <div class="sm:tw-col-span-2 lg:tw-flex-1 lg:tw-min-w-[200px]">
+        <label class="tw-text-xs tw-font-medium tw-text-[#64748b] tw-block tw-mb-1.5">
+          Buscar medicamento
+        </label>
+        <p-iconfield>
+          <p-inputicon styleClass="pi pi-search" />
+          <input
+            pInputText
+            [ngModel]="searchText"
+            (ngModelChange)="onSearchChange($event)"
+            placeholder="Nombre, código, laboratorio..."
+            class="tw-w-full" />
+        </p-iconfield>
+      </div>
+
+      <!-- Filtro alerta vencimiento -->
+      <div class="tw-min-w-[180px]">
+        <label class="tw-text-xs tw-font-medium tw-text-[#64748b] tw-block tw-mb-1.5">
+          Alerta vencimiento
+        </label>
+        <p-select
+          [(ngModel)]="filtroAlerta"
+          [options]="opcionesAlerta"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Todos"
+          (onChange)="onFilterChange()"
+          styleClass="tw-w-full" />
+      </div>
+
+      <!-- Filtro estado -->
+      <div class="tw-min-w-[150px]">
+        <label class="tw-text-xs tw-font-medium tw-text-[#64748b] tw-block tw-mb-1.5">
+          Estado
+        </label>
+        <p-select
+          [(ngModel)]="filtroEstado"
+          [options]="opcionesEstado"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Todos"
+          (onChange)="onFilterChange()"
+          styleClass="tw-w-full" />
+      </div>
+
+      <!-- Limpiar -->
+      <p-button
+        label="Limpiar"
+        icon="pi pi-filter-slash"
+        severity="secondary"
+        outlined
+        size="small"
+        (onClick)="onLimpiarFiltros()" />
+    </div>
+  </div>
+
+  <!-- Tabla de inventario -->
+  <div class="gp-card tw-overflow-hidden">
+    <p-table
+      [value]="medicamentos()"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="rows"
+      [totalRecords]="totalRecords()"
+      [loading]="isLoading()"
+      [first]="first"
+      (onPage)="onPageChange($event)"
+      [rowHover]="true"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      sortMode="single"
+      scrollable
+      scrollHeight="calc(100vh - 380px)"
+      styleClass="p-datatable-sm">
+
+      <!-- Header columns -->
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width:3rem">
+            <i class="pi pi-bell tw-text-[#94a3b8]" pTooltip="Alerta vencimiento"></i>
+          </th>
+          <th pSortableColumn="codigo" style="min-width:100px">
+            Código <p-sortIcon field="codigo" />
+          </th>
+          <th pSortableColumn="nombre" style="min-width:220px">
+            Medicamento <p-sortIcon field="nombre" />
+          </th>
+          <th style="min-width:120px">Forma / Concentración</th>
+          <th style="min-width:130px">Categoría</th>
+          <th pSortableColumn="stockActual" style="min-width:130px; text-align:right">
+            Stock Actual <p-sortIcon field="stockActual" />
+          </th>
+          <th style="min-width:100px">Nivel Stock</th>
+          <th pSortableColumn="fechaVencimiento" style="min-width:130px">
+            Vencimiento <p-sortIcon field="fechaVencimiento" />
+          </th>
+          <th style="min-width:100px">Estado</th>
+          <th style="min-width:80px; text-align:center">Acciones</th>
+        </tr>
+      </ng-template>
+
+      <!-- Body rows -->
+      <ng-template pTemplate="body" let-med>
+        <tr [class]="getRowClass(med)">
+
+          <!-- Indicador alerta -->
+          <td>
+            <p-tag
+              [severity]="getSeverityAlerta(med.alertaVencimiento)"
+              [value]="''"
+              [pTooltip]="getLabelAlerta(med.alertaVencimiento)"
+              styleClass="tw-w-5 tw-h-5 tw-rounded-full tw-p-0 tw-inline-flex tw-items-center tw-justify-center" />
+          </td>
+
+          <!-- Código -->
+          <td>
+            <code class="tw-text-xs tw-font-mono tw-bg-[#f1f5f9] tw-px-1.5 tw-py-0.5 tw-rounded tw-text-[#475569]">
+              {{ med.codigo }}
+            </code>
+          </td>
+
+          <!-- Nombre + Laboratorio -->
+          <td>
+            <div class="tw-font-medium tw-text-[#1e293b] tw-text-sm">{{ med.nombre }}</div>
+            <div class="tw-text-xs tw-text-[#64748b]">{{ med.nombreGenerico }} · {{ med.laboratorio }}</div>
+          </td>
+
+          <!-- Forma / Concentración -->
+          <td>
+            <span class="tw-text-sm tw-text-[#475569]">{{ med.forma }}</span>
+            <span class="tw-text-xs tw-text-[#94a3b8] tw-block">{{ med.concentracion }}</span>
+          </td>
+
+          <!-- Categoría -->
+          <td>
+            <span class="tw-inline-flex tw-items-center tw-gap-1 tw-text-xs tw-font-medium"
+                  [style.color]="med.categoria.color">
+              <span class="tw-w-2 tw-h-2 tw-rounded-full tw-inline-block" [style.background]="med.categoria.color"></span>
+              {{ med.categoria.nombre }}
+            </span>
+          </td>
+
+          <!-- Stock -->
+          <td class="tw-text-right">
+            <div class="tw-font-semibold tw-text-sm"
+                 [class.tw-text-red-600]="med.stockActual <= med.stockMinimo"
+                 [class.tw-text-[#1e293b]]="med.stockActual > med.stockMinimo">
+              {{ med.stockActual | number }} {{ med.unidadMedida }}
+            </div>
+            <div class="tw-text-xs tw-text-[#94a3b8]">Mín: {{ med.stockMinimo }}</div>
+          </td>
+
+          <!-- Nivel stock (barra) -->
+          <td>
+            <div class="tw-flex tw-items-center tw-gap-2">
+              <div class="tw-flex-1 tw-bg-[#f1f5f9] tw-rounded-full tw-h-1.5 tw-overflow-hidden">
+                <div
+                  class="tw-h-full tw-rounded-full tw-transition-all"
+                  [style.width.%]="getStockPct(med)"
+                  [style.background]="getStockColor(med)">
+                </div>
+              </div>
+              <span class="tw-text-xs tw-text-[#64748b] tw-w-8 tw-text-right">
+                {{ getStockPct(med) | number:'1.0-0' }}%
+              </span>
+            </div>
+          </td>
+
+          <!-- Vencimiento -->
+          <td>
+            <div class="tw-text-sm" [class.tw-text-red-600]="med.alertaVencimiento === 'VENCIDO' || med.alertaVencimiento === 'CRITICO'"
+                 [class.tw-text-amber-600]="med.alertaVencimiento === 'PROXIMO'">
+              {{ med.fechaVencimiento | date:'dd/MM/yyyy' }}
+            </div>
+            <div class="tw-text-xs tw-text-[#94a3b8]">Lote: {{ med.lote }}</div>
+          </td>
+
+          <!-- Estado -->
+          <td>
+            <p-tag
+              [severity]="med.estado === 'ACTIVO' ? 'success' : med.estado === 'VENCIDO' ? 'danger' : 'warn'"
+              [value]="med.estado"
+              styleClass="tw-text-xs" />
+          </td>
+
+          <!-- Acciones -->
+          <td class="tw-text-center">
+            <div class="tw-flex tw-items-center tw-justify-center tw-gap-1">
+              <p-button
+                icon="pi pi-eye"
+                [rounded]="true"
+                [text]="true"
+                size="small"
+                pTooltip="Ver detalle"
+                severity="info" />
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                size="small"
+                pTooltip="Editar"
+                severity="secondary"
+                (onClick)="abrirEditar(med)" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Empty state -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="10">
+            <div class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-py-16 tw-text-[#94a3b8]">
+              <i class="pi pi-inbox tw-text-5xl tw-mb-4"></i>
+              <p class="tw-text-base tw-font-medium tw-m-0">No se encontraron medicamentos</p>
+              <p class="tw-text-sm tw-mt-1">Intente modificar los filtros de búsqueda</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+    </p-table>
+  </div>
+
+</div>
+
+<!-- Modal crear / editar medicamento -->
+<p-dialog
+  [visible]="showModal()"
+  (visibleChange)="showModal.set($event)"
+  [header]="editingId() ? 'Editar Medicamento' : 'Nuevo Medicamento'"
+  [modal]="true" [draggable]="false" [style]="{ width: '600px' }">
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="tw-flex tw-flex-col tw-gap-5 tw-pt-2">
+      <div class="tw-grid tw-grid-cols-2 tw-gap-4">
+
+        <div>
+          <p-floatlabel variant="on">
+            <input pInputText id="codigo" formControlName="codigo" class="tw-w-full" />
+            <label for="codigo">Código * (máx. 20)</label>
+          </p-floatlabel>
+          @if (form.get('codigo')?.invalid && form.get('codigo')?.touched) {
+            <small class="tw-text-red-500 tw-text-xs">Código obligatorio, máx. 20 caracteres.</small>
+          }
+        </div>
+
+        <div>
+          <p-floatlabel variant="on">
+            <input pInputText id="unidadMedida" formControlName="unidadMedida" class="tw-w-full" />
+            <label for="unidadMedida">Unidad de Medida *</label>
+          </p-floatlabel>
+        </div>
+
+        <div class="tw-col-span-2">
+          <p-floatlabel variant="on">
+            <input pInputText id="nombre" formControlName="nombre" class="tw-w-full" />
+            <label for="nombre">Nombre del Medicamento *</label>
+          </p-floatlabel>
+        </div>
+
+        <div class="tw-col-span-2">
+          <p-floatlabel variant="on">
+            <input pInputText id="principioActivo" formControlName="principioActivo" class="tw-w-full" />
+            <label for="principioActivo">Principio Activo *</label>
+          </p-floatlabel>
+        </div>
+
+        <div>
+          <p-floatlabel variant="on">
+            <input pInputText id="laboratorio" formControlName="laboratorio" class="tw-w-full" />
+            <label for="laboratorio">Laboratorio</label>
+          </p-floatlabel>
+        </div>
+
+        <div>
+          <p-floatlabel variant="on">
+            <input pInputText id="concentracion" formControlName="concentracion" class="tw-w-full" />
+            <label for="concentracion">Concentración</label>
+          </p-floatlabel>
+        </div>
+
+        <div>
+          <label class="tw-text-xs tw-font-medium tw-text-[#64748b] tw-block tw-mb-1.5">Forma Farmacéutica</label>
+          <p-select
+            formControlName="formaFarmaceutica"
+            [options]="opcionesForma"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccionar"
+            styleClass="tw-w-full" />
+        </div>
+
+        <div>
+          <label class="tw-text-xs tw-font-medium tw-text-[#64748b] tw-block tw-mb-1.5">Categoría *</label>
+          <p-select
+            formControlName="categoriaId"
+            [options]="categorias()"
+            optionLabel="nombre"
+            optionValue="id"
+            placeholder="Seleccionar categoría"
+            styleClass="tw-w-full" />
+          @if (form.get('categoriaId')?.invalid && form.get('categoriaId')?.touched) {
+            <small class="tw-text-red-500 tw-text-xs">Seleccione una categoría.</small>
+          }
+        </div>
+
+        <div>
+          <label class="tw-text-xs tw-font-medium tw-text-[#64748b] tw-block tw-mb-1.5">Precio Unitario (S/) *</label>
+          <p-inputnumber
+            formControlName="precioUnitario"
+            mode="decimal"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
+            [min]="0.01"
+            styleClass="tw-w-full" />
+        </div>
+
+        <div>
+          <label class="tw-text-xs tw-font-medium tw-text-[#64748b] tw-block tw-mb-1.5">Stock Mínimo</label>
+          <p-inputnumber
+            formControlName="stockMinimo"
+            [min]="0"
+            styleClass="tw-w-full" />
+        </div>
+
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="tw-flex tw-gap-3 tw-justify-end">
+      <p-button label="Cancelar" severity="secondary" outlined (onClick)="showModal.set(false)" />
+      <p-button
+        [label]="editingId() ? 'Actualizar' : 'Guardar'"
+        icon="pi pi-check"
+        [loading]="isSaving()"
+        (onClick)="onSubmit()" />
+    </div>
+  </ng-template>
+</p-dialog>

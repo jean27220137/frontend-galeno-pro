@@ -1,0 +1,116 @@
+<!-- Lista y CRUD de Farmacias con Modal -->
+<p-confirmDialog />
+
+<div class="tw-flex tw-flex-col tw-gap-4">
+  <div class="tw-flex tw-items-center tw-justify-between">
+    <div>
+      <h2 class="tw-text-xl tw-font-bold tw-text-[#1e293b] tw-m-0">Gestión de Farmacias</h2>
+      <p class="tw-text-sm tw-text-[#64748b] tw-mt-1 tw-mb-0">{{ farmacias().length }} farmacia(s) registrada(s)</p>
+    </div>
+    <p-button label="Nueva Farmacia" icon="pi pi-plus" size="small" (onClick)="abrirNueva()" />
+  </div>
+
+  <div class="gp-card tw-overflow-hidden">
+    <p-table [value]="farmacias()" [loading]="isLoading()" [rowHover]="true" styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Dirección</th>
+          <th>Responsable</th>
+          <th>Teléfono</th>
+          <th>Estado</th>
+          <th class="tw-text-center">Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-f>
+        <tr>
+          <td><code class="tw-text-xs tw-font-mono tw-bg-[#f1f5f9] tw-px-2 tw-py-0.5 tw-rounded">{{ f.codigo }}</code></td>
+          <td class="tw-font-medium tw-text-sm">{{ f.nombre }}</td>
+          <td class="tw-text-sm tw-text-[#64748b]">{{ f.direccion }}</td>
+          <td class="tw-text-sm">{{ f.responsable }}</td>
+          <td class="tw-text-sm tw-text-[#64748b]">{{ f.telefono }}</td>
+          <td>
+            <p-tag [severity]="getSeveridadEstado(f.estado)" [value]="f.estado" styleClass="tw-text-xs" />
+          </td>
+          <td class="tw-text-center">
+            <div class="tw-flex tw-gap-1 tw-justify-center">
+              <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" size="small"
+                        (onClick)="abrirEditar(f)" pTooltip="Editar" />
+              <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small"
+                        (onClick)="confirmarEliminar(f)" pTooltip="Eliminar" />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- Modal crear/editar farmacia -->
+<p-dialog
+  [visible]="showModal()"
+  (visibleChange)="showModal.set($event)"
+  [header]="editingId() ? 'Editar Farmacia' : 'Nueva Farmacia'"
+  [modal]="true" [draggable]="false" [style]="{ width: '520px' }">
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="tw-flex tw-flex-col tw-gap-5 tw-pt-2">
+
+      <div class="tw-grid tw-grid-cols-2 tw-gap-4">
+        <div class="tw-col-span-2">
+          <p-floatlabel variant="on">
+            <input pInputText id="nombre" formControlName="nombre" class="tw-w-full" />
+            <label for="nombre">Nombre de la farmacia *</label>
+          </p-floatlabel>
+          @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
+            <small class="tw-text-red-500 tw-text-xs">Mínimo 3 caracteres.</small>
+          }
+        </div>
+
+        <div>
+          <p-floatlabel variant="on">
+            <input pInputText id="codigo" formControlName="codigo" class="tw-w-full"
+                   placeholder="Ej: FC-01" style="text-transform:uppercase" />
+            <label for="codigo">Código *</label>
+          </p-floatlabel>
+          @if (form.get('codigo')?.invalid && form.get('codigo')?.touched) {
+            <small class="tw-text-red-500 tw-text-xs">Solo letras, números y guiones.</small>
+          }
+        </div>
+
+        <div>
+          <p-floatlabel variant="on">
+            <input pInputText id="telefono" formControlName="telefono" class="tw-w-full" />
+            <label for="telefono">Teléfono *</label>
+          </p-floatlabel>
+          @if (form.get('telefono')?.invalid && form.get('telefono')?.touched) {
+            <small class="tw-text-red-500 tw-text-xs">7 a 15 dígitos.</small>
+          }
+        </div>
+
+        <div class="tw-col-span-2">
+          <p-floatlabel variant="on">
+            <input pInputText id="direccion" formControlName="direccion" class="tw-w-full" />
+            <label for="direccion">Dirección / Ubicación *</label>
+          </p-floatlabel>
+        </div>
+
+        <div class="tw-col-span-2">
+          <p-floatlabel variant="on">
+            <input pInputText id="responsable" formControlName="responsable" class="tw-w-full" />
+            <label for="responsable">Químico Farmacéutico Responsable *</label>
+          </p-floatlabel>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="tw-flex tw-gap-3 tw-justify-end">
+      <p-button label="Cancelar" severity="secondary" outlined (onClick)="showModal.set(false)" />
+      <p-button [label]="editingId() ? 'Actualizar' : 'Crear Farmacia'" icon="pi pi-check"
+                [loading]="isSaving()" (onClick)="onSubmit()" />
+    </div>
+  </ng-template>
+</p-dialog>

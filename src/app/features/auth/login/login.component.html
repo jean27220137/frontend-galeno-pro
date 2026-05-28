@@ -1,0 +1,128 @@
+<!-- ═══════════════════════════════════════════════════════════
+     Pantalla de Login — Galenos Pro
+     ═══════════════════════════════════════════════════════════ -->
+<div class="login-root">
+
+  <!-- Fondo decorativo -->
+  <div class="login-bg" aria-hidden="true">
+    <div class="login-bg__circle login-bg__circle--1"></div>
+    <div class="login-bg__circle login-bg__circle--2"></div>
+    <div class="login-bg__circle login-bg__circle--3"></div>
+  </div>
+
+  <!-- Panel principal -->
+  <main class="login-panel gp-fade-in" role="main">
+
+    <!-- Cabecera de la tarjeta -->
+    <header class="login-panel__header">
+      <div class="login-panel__logo" aria-hidden="true">
+        <i class="pi pi-heart-fill"></i>
+      </div>
+      <h1 class="login-panel__title">
+        <span class="login-panel__title-name">Galenos</span>
+        <span class="login-panel__title-pro">Pro</span>
+      </h1>
+      <p class="login-panel__subtitle">Sistema de Gestión Hospitalaria</p>
+    </header>
+
+    <p-divider />
+
+    <!-- Formulario -->
+    <section class="login-panel__body" aria-label="Formulario de acceso">
+      <h2 class="login-panel__form-title">Iniciar sesión</h2>
+
+      <!-- Error global -->
+      @if (errorMsg()) {
+        <p-message
+          severity="error"
+          [text]="errorMsg()!"
+          styleClass="tw-w-full tw-mb-4"
+          icon="pi pi-times-circle" />
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+        <!-- Usuario -->
+        <div class="login-field">
+          <p-floatlabel variant="on">
+            <input
+              pInputText
+              id="username"
+              formControlName="username"
+              autocomplete="username"
+              [class.ng-invalid]="username.invalid && username.touched"
+              [class.ng-dirty]="username.dirty"
+              class="login-field__input"
+              aria-describedby="username-error"
+              type="text" />
+            <label for="username">
+              <i class="pi pi-user"></i> Usuario
+            </label>
+          </p-floatlabel>
+          @if (username.invalid && username.touched) {
+            <small id="username-error" class="login-field__error" role="alert">
+              @if (username.hasError('required')) { El usuario es obligatorio. }
+              @else if (username.hasError('minlength')) { Mínimo 3 caracteres. }
+            </small>
+          }
+        </div>
+
+        <!-- Contraseña -->
+        <div class="login-field">
+          <p-floatlabel variant="on">
+            <p-password
+              inputId="password"
+              formControlName="password"
+              [feedback]="false"
+              [toggleMask]="true"
+              autocomplete="current-password"
+              styleClass="tw-w-full"
+              inputStyleClass="login-field__input"
+              [class.ng-invalid]="password.invalid && password.touched"
+              aria-describedby="password-error" />
+            <label for="password">
+              <i class="pi pi-lock"></i> Contraseña
+            </label>
+          </p-floatlabel>
+          @if (password.invalid && password.touched) {
+            <small id="password-error" class="login-field__error" role="alert">
+              @if (password.hasError('required')) { La contraseña es obligatoria. }
+              @else if (password.hasError('minlength')) { Mínimo 6 caracteres. }
+            </small>
+          }
+        </div>
+
+        <!-- Botón de acceso -->
+        <p-button
+          type="submit"
+          label="Acceder al Sistema"
+          icon="pi pi-sign-in"
+          iconPos="right"
+          [loading]="isLoading()"
+          [disabled]="isLoading()"
+          styleClass="tw-w-full login-submit-btn"
+          size="large" />
+
+      </form>
+    </section>
+
+    <!-- Credenciales de prueba 
+    <footer class="login-panel__footer">
+      <div class="login-hint">
+        <i class="pi pi-info-circle" aria-hidden="true"></i>
+        <div>
+          <strong>Acceso de demostración:</strong>
+          <br>Usuario: <code>admin</code> &nbsp;·&nbsp; Clave: <code>admin123</code>
+        </div>
+      </div>
+    </footer>-->
+
+  </main>
+
+  <!-- Insignia de entorno -->
+  <div class="env-badge" aria-label="Entorno de ejecución" role="note">
+    <i class="pi pi-server"></i> DEV
+  </div>
+
+</div>
+
