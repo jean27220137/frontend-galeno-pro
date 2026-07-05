@@ -13,7 +13,7 @@ pipeline {
                 withSonarQubeEnv('SonarQube') {
                     script {
                         def scannerHome = tool 'SonarScanner'
-                        bat """\\bin\\sonar-scanner.bat"" -Dsonar.projectKey=galenos-frontend -Dsonar.sources=src -Dsonar.projectName=GalenosPro-Frontend"
+                        bat scannerHome + '\\bin\\sonar-scanner.bat'
                     }
                 }
             }
